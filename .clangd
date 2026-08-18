@@ -1,0 +1,23 @@
+CompileFlags:
+  Add:
+    - -std=c++23
+    - -msse2
+    - -Wall
+    - -Wextra
+  Remove:
+    - -fno-var-tracking-assignments
+    - -mno-direct-extern-access
+    - -Wduplicated-cond
+    - -Wduplicated-branches
+    - -Wlogical-op
+    - -Wuseless-cast
+
+Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: None
+  ClangTidy:
+    Remove:
+      - readability-function-cognitive-complexity
+
+InlayHints: { Enabled: true, ParameterNames: true, DeducedTypes: true }
+Hover: { ShowAKA: true }

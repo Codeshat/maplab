@@ -1,0 +1,108 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 25, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "MAPLAB_WERROR": "ON"
+      }
+    },
+    {
+      "name": "debug-san",
+      "inherits": "base",
+      "displayName": "Debug + ASan/UBSan (the default dev preset)",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS_DEBUG": "-O1 -g -fno-omit-frame-pointer",
+        "MAPLAB_SANITIZE": "address;undefined",
+        "MAPLAB_BUILD_TESTS": "ON",
+        "MAPLAB_BUILD_BENCH": "OFF",
+        "MAPLAB_BUILD_EXPERIMENTS": "OFF"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "displayName": "Debug, no sanitizers (for stepping without ASan noise)",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS_DEBUG": "-O0 -g",
+        "MAPLAB_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "displayName": "Release: tests + benchmarks + experiments",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "MAPLAB_BUILD_TESTS": "ON",
+        "MAPLAB_BUILD_BENCH": "ON",
+        "MAPLAB_BUILD_EXPERIMENTS": "ON"
+      }
+    },
+    {
+      "name": "release-native",
+      "inherits": "release",
+      "displayName": "Release + -march=native (measurement only, never installed)",
+      "cacheVariables": { "MAPLAB_NATIVE": "ON" }
+    },
+    {
+      "name": "relwithdebinfo",
+      "inherits": "base",
+      "displayName": "-O2 -g, frame pointers kept, for perf(1)",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O2 -g -DNDEBUG -fno-omit-frame-pointer",
+        "MAPLAB_BUILD_TESTS": "ON",
+        "MAPLAB_BUILD_BENCH": "ON",
+        "MAPLAB_BUILD_EXPERIMENTS": "ON"
+      }
+    },
+    {
+      "name": "fuzz",
+      "inherits": "base",
+      "description": "Requires Clang >= 18; set CC/CXX first, e.g. CC=clang-19 CXX=clang++-19 cmake --preset fuzz",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "MAPLAB_BUILD_FUZZERS": "ON",
+        "MAPLAB_BUILD_TESTS": "OFF",
+        "MAPLAB_SANITIZE": "address;undefined"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "debug-san", "configurePreset": "debug-san" },
+    { "name": "debug", "configurePreset": "debug" },
+    { "name": "release", "configurePreset": "release" },
+    { "name": "release-native", "configurePreset": "release-native" },
+    { "name": "relwithdebinfo", "configurePreset": "relwithdebinfo" },
+    { "name": "fuzz", "configurePreset": "fuzz" }
+  ],
+  "testPresets": [
+    {
+      "name": "tbase",
+      "hidden": true,
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error", "stopOnFailure": false }
+    },
+    { "name": "debug-san", "inherits": "tbase", "configurePreset": "debug-san" },
+    { "name": "debug", "inherits": "tbase", "configurePreset": "debug" },
+    { "name": "release", "inherits": "tbase", "configurePreset": "release" }
+  ],
+  "workflowPresets": [
+    {
+      "name": "ci",
+      "steps": [
+        { "type": "configure", "name": "debug-san" },
+        { "type": "build", "name": "debug-san" },
+        { "type": "test", "name": "debug-san" }
+      ]
+    }
+  ]
+}

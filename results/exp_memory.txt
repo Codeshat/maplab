@@ -1,0 +1,38 @@
+
+=== Experiment 7: memory per element ============================
+Counted with a global allocator that charges each allocation what it costs
+the heap (glibc chunk size), not what was requested. On glibc a 24-byte
+node occupies 32 bytes, so counting requests would credit a node-based map
+with 25% memory it does not have.
+
+            implementation    elements         bytes     B/elem   vs maplab  
+--------------------------  ----------  ------------  ---------  ----------  
+          maplab::flat_map       16384        561144      34.25       1.00x  
+   maplab (at 7/8 ceiling)       14335        278544      19.43       0.50x  
+   ankerl::unordered_dense       16384        524320      32.00       0.93x  
+        std::unordered_map       16384        690400      42.14       1.23x  
+
+          maplab::flat_map      262144       8916984      34.02       1.00x  
+   maplab (at 7/8 ceiling)      229375       4456464      19.43       0.50x  
+   ankerl::unordered_dense      262144       8388640      32.00       0.94x  
+        std::unordered_map      262144      11197296      42.71       1.26x  
+
+          maplab::flat_map     2097152      71307256      34.00       1.00x  
+   maplab (at 7/8 ceiling)     1835007      35655672      19.43       0.50x  
+   ankerl::unordered_dense     2097152      67117040      32.00       0.94x  
+        std::unordered_map     2097152      90620168      43.21       1.27x  
+
+maplab stores sizeof(pair) + 1 control byte per slot, so at its 7/8 ceiling
+the floor is (16 + 1) / 0.875 = 19.4 bytes per element -- and up to twice
+that immediately after a rehash, which is what the first row samples. That
+range is the honest statement: a power-of-two capacity means a flat table's
+density depends on where in the growth cycle you look.
+
+std::unordered_map's cost is structural instead of cyclical: a next pointer
+and a separate heap chunk per element, neither of which a load factor can
+reclaim. ankerl::unordered_dense stores its values in a dense vector with a
+separate index array, which is why it beats both here and pays for it on
+erase instead.
+
+Timing noise on this run: worst (max-min)/min across all measurements was 0.0%.
+  -> wrote results/exp7_memory.csv

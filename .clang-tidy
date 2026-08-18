@@ -1,0 +1,64 @@
+# Whole families on, individual checks off with a written reason.
+Checks: >
+  -*,
+  bugprone-*, cert-*, concurrency-*, cppcoreguidelines-*,
+  misc-*, modernize-*, performance-*, portability-*, readability-*,
+  -bugprone-easily-swappable-parameters,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -misc-include-cleaner,
+  -modernize-use-trailing-return-type,
+  -portability-simd-intrinsics,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-avoid-do-while,
+  -readability-function-cognitive-complexity,
+  -readability-braces-around-statements,
+  -misc-non-private-member-variables-in-classes,
+  -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+
+# Rationale for the disables above, in order:
+#   portability-simd-intrinsics          wants std::experimental::simd; the whole point of
+#                                        this project is the concrete SSE2 sequence.
+#   pro-type-reinterpret-cast            unavoidable when a control array and a slot array
+#                                        live in one raw byte allocation.
+#   pro-bounds-pointer-arithmetic        the control array *is* a pointer-arithmetic scan.
+#   pro-type-union-access                slot_type is a union of pair<const K,V>/pair<K,V>;
+#                                        see DESIGN.md "Standard-conformance notes".
+#   owning-memory                        the map owns one raw allocation on purpose.
+#   avoid-do-while / cognitive-complexity  the probe loop is a deliberate do/while; splitting
+#                                        it into helpers is what the codegen must not do.
+#   braces-around-statements             the codebase consistently writes single-statement
+#                                        guards as `if (x) return y;`, matching the style
+#                                        .clang-format enforces. Adding braces to 29 of them
+#                                        would make the probe loop longer, not clearer.
+#   non-private-member-variables         probe_stats is a plain counter block that hot code
+#                                        increments directly; accessors would be ceremony
+#                                        around `++s.key_compares`.
+#   macro-usage                          MAPLAB_ASSUME cannot be a constexpr function: the
+#                                        whole point is to emit __builtin_unreachable in the
+#                                        caller's context. It is the only macro maplab
+#                                        defines.
+#   pro-bounds-constant-array-index      indexing a fixed-size std::array by a value the
+#                                        surrounding code has already bounded.
+
+WarningsAsErrors: ''
+HeaderFilterRegex: 'include/maplab/.*\.hpp$'
+FormatStyle: file
+
+CheckOptions:
+  readability-identifier-naming.NamespaceCase: lower_case
+  readability-identifier-naming.ClassCase: lower_case
+  readability-identifier-naming.StructCase: lower_case
+  readability-identifier-naming.EnumCase: lower_case
+  readability-identifier-naming.EnumConstantCase: lower_case
+  readability-identifier-naming.FunctionCase: lower_case
+  readability-identifier-naming.VariableCase: lower_case
+  readability-identifier-naming.PrivateMemberSuffix: '_'
+  readability-identifier-naming.ConstexprVariableCase: lower_case
+  readability-identifier-naming.GlobalConstantCase: lower_case
+  readability-identifier-naming.MacroDefinitionCase: UPPER_CASE

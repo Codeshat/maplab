@@ -1,0 +1,124 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CMAKE_COLOR_DIAGNOSTICS: "ON"
+
+jobs:
+  test:
+    name: test (${{ matrix.compiler }}, ${{ matrix.preset }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc-13, clang-19]
+        preset: [debug-san, release]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build catch2
+          if [ "${{ matrix.compiler }}" = "clang-19" ]; then
+            sudo apt-get install -y clang-19
+            echo "CC=clang-19"   >> "$GITHUB_ENV"
+            echo "CXX=clang++-19" >> "$GITHUB_ENV"
+          else
+            sudo apt-get install -y g++-13
+            echo "CC=gcc-13"  >> "$GITHUB_ENV"
+            echo "CXX=g++-13" >> "$GITHUB_ENV"
+          fi
+
+      - name: Cache FetchContent
+        uses: actions/cache@v4
+        with:
+          path: build/${{ matrix.preset }}/_deps
+          key: deps-${{ matrix.compiler }}-${{ matrix.preset }}-${{ hashFiles('**/CMakeLists.txt') }}
+
+      - run: cmake --preset ${{ matrix.preset }}
+      - run: cmake --build --preset ${{ matrix.preset }}
+      - run: ctest --preset ${{ matrix.preset }}
+
+      # The scalar probe is the control group for Experiment 1, so a regression in it
+      # would silently corrupt a published result rather than fail a test. The whole
+      # differential matrix runs every ablation configuration, and this step makes the
+      # long soak explicit on the optimised build.
+      - name: Differential soak
+        if: matrix.preset == 'release'
+        run: ./build/release/bin/maplab_tests "[.soak]"
+
+  benchmarks:
+    # Explicitly NOT a performance gate: shared runners are far too noisy, and a flaky
+    # threshold trains everyone to ignore red. This only proves the suite still builds
+    # and runs end to end.
+    name: benchmarks (smoke)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build catch2 g++-13
+      - run: cmake --preset release
+      - run: cmake --build --preset release
+      - name: Smoke-run the benchmark suite
+        run: ./build/release/bin/maplab_bench --benchmark_min_time=0.01s --benchmark_filter='find_(hit|miss)'
+      - name: Smoke-run the experiments
+        run: |
+          for exp in exp_h2_filter exp_group_size exp_memory; do
+            echo "== $exp"
+            ./build/release/bin/"$exp" > /dev/null
+          done
+          ls -l results/
+
+  lint:
+    name: format + tidy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build catch2 clang-19 clang-format-19 clang-tidy-19
+
+      # clang-format reports violations as `error:`, not `warning:`. Grepping the output
+      # for "warning" gives a false clean, so check the exit code.
+      - name: clang-format
+        run: |
+          find include support tests bench experiments -name '*.hpp' -o -name '*.cpp' \
+            | xargs clang-format-19 --dry-run --Werror
+
+      # Configured with clang on purpose: clang-tidy reads compile_commands.json, and a
+      # GCC-configured build dir feeds it GCC-only warning flags it rejects outright.
+      - name: clang-tidy
+        env:
+          CC: clang-19
+          CXX: clang++-19
+        run: |
+          cmake --preset release
+          find include/maplab tests bench experiments -name '*.cpp' -o -name '*.hpp' \
+            | xargs clang-tidy-19 -p build/release --warnings-as-errors='*'
+
+  plots:
+    name: figures render
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build catch2 g++-13 python3-matplotlib
+      - run: cmake --preset release && cmake --build --preset release
+      # A short run, purely to prove plot.py still parses what the binaries emit. The
+      # figures committed in docs/img are produced by a real run; see RESULTS.md.
+      - run: |
+          MAPLAB_RESULTS_DIR=/tmp/results ./build/release/bin/exp_h2_filter > /dev/null
+          MAPLAB_RESULTS_DIR=/tmp/results ./build/release/bin/exp_memory > /dev/null
+          python3 bench/plots/plot.py --results /tmp/results --out /tmp/img
+          ls -l /tmp/img

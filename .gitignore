@@ -1,0 +1,7 @@
+build/
+compile_commands.json
+__pycache__/
+*.pyc
+.venv/
+results/*.json
+!results/.gitkeep

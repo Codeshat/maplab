@@ -1,0 +1,22 @@
+
+=== Experiment 1: SIMD group probe vs scalar control scan =======
+Same layout, same probe order, same load factor. The only difference is
+how 16 control bytes are turned into a candidate bitmask.
+
+  elements    simd hit   scalar hit    hit x   simd miss   scalar miss   miss x   groups/hit  
+----------  ----------  -----------  -------  ----------  ------------  -------  -----------  
+      1024        6.21        16.38     2.64        6.28         31.88     5.08        1.001  
+      8192       14.88        40.04     2.69       11.72         64.86     5.53        1.000  
+     65536       23.61        70.40     2.98       13.75         73.62     5.35        1.000  
+    524288       39.47        88.29     2.24       13.74         49.79     3.62        1.000  
+   4194304      116.19       292.17     2.51       77.26        265.65     3.44        1.000  
+
+The groups/lookup column is identical for both probes by construction:
+the ablation changes how a group is scanned, never which groups are
+scanned. Any difference in the time column is therefore the scan itself.
+
+Timing noise on this run: worst (max-min)/min across all measurements was 276.5%.
+That is high. Timings below are best-of-7 and still carry that much run-to-run
+variation, so read the counter columns as the result and the nanoseconds as
+corroboration. See RESULTS.md for this machine's configuration.
+  -> wrote results/exp1_simd_vs_scalar.csv

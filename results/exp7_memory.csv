@@ -1,0 +1,13 @@
+impl,elements,bytes,bytes_per_elem,allocations_note
+maplab::flat_map,16384,561144,34.2495,after inserting n keys
+maplab (at 7/8 ceiling),14335,278544,19.4310,filled to the growth ceiling
+ankerl::unordered_dense,16384,524320,32.0020,after inserting n keys
+std::unordered_map,16384,690400,42.1387,after inserting n keys
+maplab::flat_map,262144,8916984,34.0156,after inserting n keys
+maplab (at 7/8 ceiling),229375,4456464,19.4287,filled to the growth ceiling
+ankerl::unordered_dense,262144,8388640,32.0001,after inserting n keys
+std::unordered_map,262144,11197296,42.7143,after inserting n keys
+maplab::flat_map,2097152,71307256,34.0019,after inserting n keys
+maplab (at 7/8 ceiling),1835007,35655672,19.4308,filled to the growth ceiling
+ankerl::unordered_dense,2097152,67117040,32.0039,after inserting n keys
+std::unordered_map,2097152,90620168,43.2111,after inserting n keys

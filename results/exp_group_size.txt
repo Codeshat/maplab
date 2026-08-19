@@ -2,15 +2,15 @@
 === Experiment 6: group width 8 vs 16 ===========================
   elements    w16 hit     w8 hit    w16 miss    w8 miss   grp/miss 16   grp/miss 8  
 ----------  ---------  ---------  ----------  ---------  ------------  -----------  
-      4096      16.43      18.35       34.15      42.85         1.931        2.660  
-     65536      33.44      35.48       42.51      59.24         1.975        2.758  
-   1048576      47.80      49.44       69.61      80.83         1.969        2.732  
-   4194304     110.80     137.93       61.12      94.79         1.968        2.728  
+      4096      18.15      19.96       46.83      43.23         1.931        2.660  
+     65536      50.18      36.49       46.02      72.94         1.975        2.758  
+   1048576      98.79      51.07       69.95      88.58         1.969        2.732  
+   4194304     165.34     153.74      103.54     120.54         1.968        2.728  
 
 The groups/miss columns are the mechanism: a narrower group contains an
 empty byte less often, so a miss takes more steps to prove absence.
 
-Timing noise on this run: worst (max-min)/min across all measurements was 235.6%.
+Timing noise on this run: worst (max-min)/min across all measurements was 573.2%.
 That is high. Timings below are best-of-7 and still carry that much run-to-run
 variation, so read the counter columns as the result and the nanoseconds as
 corroboration. See RESULTS.md for this machine's configuration.

@@ -5,17 +5,17 @@ how 16 control bytes are turned into a candidate bitmask.
 
   elements    simd hit   scalar hit    hit x   simd miss   scalar miss   miss x   groups/hit  
 ----------  ----------  -----------  -------  ----------  ------------  -------  -----------  
-      1024        6.21        16.38     2.64        6.28         31.88     5.08        1.001  
-      8192       14.88        40.04     2.69       11.72         64.86     5.53        1.000  
-     65536       23.61        70.40     2.98       13.75         73.62     5.35        1.000  
-    524288       39.47        88.29     2.24       13.74         49.79     3.62        1.000  
-   4194304      116.19       292.17     2.51       77.26        265.65     3.44        1.000  
+      1024       19.06        49.16     2.58       12.94         75.95     5.87        1.001  
+      8192       14.08        39.62     2.81       13.97         66.88     4.79        1.000  
+     65536       28.61        89.68     3.13       13.13         66.81     5.09        1.000  
+    524288      113.26       197.15     1.74       26.04        143.86     5.52        1.000  
+   4194304       66.16       135.58     2.05       36.54        116.50     3.19        1.000  
 
 The groups/lookup column is identical for both probes by construction:
 the ablation changes how a group is scanned, never which groups are
 scanned. Any difference in the time column is therefore the scan itself.
 
-Timing noise on this run: worst (max-min)/min across all measurements was 276.5%.
+Timing noise on this run: worst (max-min)/min across all measurements was 383.3%.
 That is high. Timings below are best-of-7 and still carry that much run-to-run
 variation, so read the counter columns as the result and the nanoseconds as
 corroboration. See RESULTS.md for this machine's configuration.

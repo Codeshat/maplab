@@ -6,22 +6,19 @@ interleaved.
 
  max load   actual   elements   B/elem    hit ns   miss ns   grp/hit   grp/miss   p99 miss   cmp/hit  
 ---------  -------  ---------  -------  --------  --------  --------  ---------  ---------  --------  
-      1/2    0.500     262143     34.0     77.24     25.14     1.000      1.004          1     1.004  
-      5/8    0.625     327679     27.2     88.87     33.03     1.004      1.037          2     1.007  
-    11/16    0.687     360447     24.7     89.44     34.37     1.009      1.086          3     1.009  
-      3/4    0.750     393215     22.7     77.00     36.72     1.019      1.201          4     1.012  
-    13/16    0.812     425983     20.9     88.87     48.13     1.041      1.430          5     1.016  
-      7/8    0.875     458751     19.4     90.81     69.17     1.084      1.959          7     1.024  
-    29/32    0.906     475135     18.8     96.96     85.65     1.125      2.525         10     1.030  
-    15/16    0.937     491519     18.1     92.42    111.72     1.188      3.708         15     1.038  
-    31/32    0.969     507903     17.5     95.15    180.82     1.314      7.418         32     1.055  
+      1/2    0.500     262143     34.0     41.04     12.81     1.000      1.004          1     1.004  
+      5/8    0.625     327679     27.2     40.77     14.43     1.004      1.037          2     1.007  
+    11/16    0.687     360447     24.7     41.43     15.87     1.009      1.086          3     1.009  
+      3/4    0.750     393215     22.7     41.70     18.76     1.019      1.201          4     1.012  
+    13/16    0.812     425983     20.9     41.63     24.34     1.041      1.430          5     1.016  
+      7/8    0.875     458751     19.4     42.76     34.70     1.084      1.959          7     1.024  
+    29/32    0.906     475135     18.8     44.80     42.84     1.125      2.525         10     1.030  
+    15/16    0.937     491519     18.1     45.57     53.83     1.188      3.708         15     1.038  
+    31/32    0.969     507903     17.5     47.80     88.01     1.314      7.418         32     1.055  
 
 The miss column is the one that moves: a miss must find an empty control
 byte, and the chance that a group of 16 contains none grows as alpha^16.
 
-Timing noise on this run: worst (max-min)/min across all measurements was 84.8%.
-That is high. Timings below are best-of-7 and still carry that much run-to-run
-variation, so read the counter columns as the result and the nanoseconds as
-corroboration. See RESULTS.md for this machine's configuration.
+Timing noise on this run: worst (max-min)/min across all measurements was 8.9%.
   -> wrote results/exp2_probe_histogram.csv
   -> wrote results/exp2_load_factor.csv

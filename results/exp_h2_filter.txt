@@ -7,22 +7,22 @@ load factor, differing only in what the control byte carries.
 -- 65536 elements
                variant    hit ns   miss ns   cmp/hit   cmp/miss   H2 FP rate   grp/hit  
 ----------------------  --------  --------  --------  ---------  -----------  --------  
-           H2 (7 bits)     31.21      9.30     1.004      0.064        0.37%     1.000  
- no H2 (occupied only)     42.02     87.01     1.502      8.031       33.41%     1.000  
-     H2 from H1's bits     46.36     34.40     1.251      0.503       20.05%     1.000  
+           H2 (7 bits)     13.74      7.17     1.004      0.064        0.37%     1.000  
+ no H2 (occupied only)     22.02     44.16     1.502      8.031       33.41%     1.000  
+     H2 from H1's bits     18.33     16.33     1.251      0.503       20.05%     1.000  
 
 -- 4194304 elements
                variant    hit ns   miss ns   cmp/hit   cmp/miss   H2 FP rate   grp/hit  
 ----------------------  --------  --------  --------  ---------  -----------  --------  
-           H2 (7 bits)     80.08     56.06     1.004      0.063        0.39%     1.000  
- no H2 (occupied only)    165.26    387.94     1.500      8.037       33.32%     1.000  
-     H2 from H1's bits    118.81     86.61     1.250      0.500       20.02%     1.000  
+           H2 (7 bits)     89.10     36.32     1.004      0.063        0.39%     1.000  
+ no H2 (occupied only)    102.65    224.65     1.500      8.037       33.32%     1.000  
+     H2 from H1's bits     80.21     57.20     1.250      0.500       20.02%     1.000  
 
 The theoretical false-positive rate of a 7-bit fingerprint is 1/128 =
 0.78% per occupied slot examined. The first row should land near it; the
 third should not, despite storing exactly the same 7 bits.
 
-Timing noise on this run: worst (max-min)/min across all measurements was 347.5%.
+Timing noise on this run: worst (max-min)/min across all measurements was 237.6%.
 That is high. Timings below are best-of-7 and still carry that much run-to-run
 variation, so read the counter columns as the result and the nanoseconds as
 corroboration. See RESULTS.md for this machine's configuration.

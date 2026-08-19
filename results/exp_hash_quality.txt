@@ -6,15 +6,15 @@ against structured input -- which is to say, none.
 
           hash         keys   insert ns    hit ns   miss ns   grp/hit     p99   cmp/hit  
 --------------  -----------  ----------  --------  --------  --------  ------  --------  
-      identity       random       51.86     82.74     24.66     1.000       1     1.004  
-        fmix64       random       58.40    121.93     30.45     1.000       1     1.004  
-        wyhash       random       58.42     96.63     28.54     1.000       1     1.004  
-      identity   sequential     1487.81   1166.06   2443.06   175.787      32    29.708  
-        fmix64   sequential      102.24    105.13     33.21     1.000       1     1.004  
-        wyhash   sequential       59.21     95.41     27.88     1.019       2     1.010  
-      identity      strided      131.76    358.78    418.70     1.000       1     8.500  
-        fmix64      strided       52.24    113.77     33.05     1.000       1     1.004  
-        wyhash      strided       27.35    100.11     30.18     1.001       1     1.003  
+      identity       random       91.04     84.57     29.14     1.000       1     1.004  
+        fmix64       random       52.63    108.83     31.59     1.000       1     1.004  
+        wyhash       random       60.16    116.86     34.03     1.000       1     1.004  
+      identity   sequential      865.50    855.78   1054.60   175.787      32    29.708  
+        fmix64   sequential       25.16     50.81     15.83     1.000       1     1.004  
+        wyhash   sequential       28.19     45.28     14.14     1.019       2     1.010  
+      identity      strided       67.06    167.36    192.94     1.000       1     8.500  
+        fmix64      strided       25.05     50.90     15.71     1.000       1     1.004  
+        wyhash      strided       27.84     44.83     14.24     1.001       1     1.003  
 
 The two identity failures are different failures, and only the counters tell
 them apart:
@@ -35,7 +35,7 @@ them apart:
 Neither is repairable by better probing. This is the argument for the table owning
 its mixer rather than inheriting whatever std::hash the key type came with.
 
-Timing noise on this run: worst (max-min)/min across all measurements was 124.0%.
+Timing noise on this run: worst (max-min)/min across all measurements was 337.4%.
 That is high. Timings below are best-of-7 and still carry that much run-to-run
 variation, so read the counter columns as the result and the nanoseconds as
 corroboration. See RESULTS.md for this machine's configuration.
